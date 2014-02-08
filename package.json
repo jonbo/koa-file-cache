@@ -1,0 +1,34 @@
+{
+    "name": "koa-file-cache",
+    "version": "0.2.0",
+    "description": "Koa middleware to cache expensive requests (e.g. remote, nested DB, etc) to disk",
+    "repository": "jonbo/koa-file-cache",
+    "main": "index.js",
+
+    "keywords": [
+        "koa",
+        "middleware",
+        "file",
+        "cache",
+        "disk"
+    ],
+
+    "dependencies": {
+        "debug": "*"
+    },
+    "peerDependencies": {
+        "koa": "~0.3.0"
+    },
+    "devDependencies": {
+        "koa": "~0.3.0",
+        "mocha": "~1.17.1",
+        "should": "~3.1.2",
+        "supertest": "~0.9.0"
+    },
+    "license": "MIT",
+
+    "scripts": {
+        "test": "make test"
+    }
+
+}
