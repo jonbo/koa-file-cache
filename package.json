@@ -2,7 +2,10 @@
     "name": "koa-file-cache",
     "version": "0.2.0",
     "description": "Koa middleware to cache expensive requests (e.g. remote, nested DB, etc) to disk",
-    "repository": "jonbo/koa-file-cache",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jonbo/koa-file-cache"
+    },
     "main": "index.js",
 
     "keywords": [

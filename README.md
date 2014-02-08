@@ -8,12 +8,14 @@ Cached files will bypass any downstream middleware and be streamed directly to t
 ## Example
 
 ```js
+// Dictionary API that caches all words that match a given letter, each day
+// (GET /?letter=a)
 var db = require(...);
 var Cache = require('koa-file-cache');
 
 // Determine the letter and set the cache file name
 function* getLetter(next) {
-    this.letter = this.query.letter || "a";
+    this.letter = (this.query.letter || "a").charAt(0);
     this.cacheName = this.letter + '.words';
     yield next;
 }
@@ -25,7 +27,7 @@ var app = koa();
 app.use(getLetter);
 app.use(Cache({folder: 'dictionary', cacheTime: aDay}));
 app.use(function*(next){
-    // This will happen, at most, only once per day
+    // This will happen, at most, only once per day (per letter)
     // *Heavy DB query*
     var words = yield db.query('... WHERE letter = ?',[this.letter]);
 
