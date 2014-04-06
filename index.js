@@ -38,6 +38,9 @@ function Cache(options) {
         var fileName = getFileName(this, options); // extension-less (.gz)
         var fileInfo = yield getFileInfo(fileName, options);
 
+        this.cacheOptions = options;
+        this.cacheInfo = fileInfo;
+
         debug(fileInfo.name, " has expired: "+ fileInfo.expired);
 
         // If no cache exists or is expired (save)
@@ -52,7 +55,7 @@ function Cache(options) {
                 return;
             }
 
-            yield saveCache(this, options, fileName);
+            yield saveCache(this, fileName);
 
             // Set some useful caching headers
             var lastModifiedApprox = new Date();
@@ -117,11 +120,8 @@ function Cache(options) {
 
             // If we need to load the file into memory uncompressed
             if (options.delegate || force_parse_file) {
-                // Read the file
-                debug("Reading from "+fileInfo.name);
-                var cache = yield readFile(fileInfo.name);
 
-                cache = yield loadCacheUncompressed(options, cache, fileInfo.gzipped);
+                var cache = yield Cache.get(this);
 
                 // Store the cache directly in the body
                 this.body = cache;
@@ -136,6 +136,20 @@ function Cache(options) {
         }
     };
 }
+Cache.get = function*(ctx) {
+    var fileInfo = ctx.cacheInfo;
+    var options = ctx.cacheOptions;
+
+    if (!fileInfo.exists) {
+        return null;
+    }
+    // Read the file
+    debug("Reading from "+fileInfo.name);
+
+    var cache = yield readFile(fileInfo.name);
+    cache = yield loadCacheUncompressed(options, cache, fileInfo.gzipped);
+    return cache;
+};
 module.exports = Cache;
 
 function* loadCacheUncompressed(options, cache, isGzipped) {
@@ -159,7 +173,8 @@ function* loadCacheUncompressed(options, cache, isGzipped) {
 }
 
 // Save the cache
-function saveCache(ctx, options, fileName) {
+function saveCache(ctx, fileName) {
+    var options = ctx.cacheOptions;
     return function(cb) {
         // Stringify any JSON
         if (options.type === 'json') {
@@ -200,23 +215,22 @@ function parseJSON(str) {
 
 // Determine if cache has expired (or doesn't exist)
 function* getFileInfo(fileName, options) {
-    var info = {name:fileName, stats:null, expired: false, gzipped:false};
-    var cacheExists = false;
+    var info = {name:fileName, stats:null, expired: false, gzipped:false, exists: false};
 
     // If gzip is enabled, check filename.gz names first
-    if (options.gzip) cacheExists = yield fileExists(fileName+'.gz');
+    if (options.gzip) info.exists = yield fileExists(fileName+'.gz');
 
     // If it does save some info, or else attempt without .gz
-    if (cacheExists) {
+    if (info.exists) {
         info.name = fileName+'.gz';
         info.gzipped = true;
     }
     else {
-        cacheExists = yield fileExists(fileName);
+        info.exists = yield fileExists(fileName);
     }
 
     // If either exists, retrieve stats and if it has expired
-    if (cacheExists) {
+    if (info.exists) {
         info.stats =  yield fileStat(info.name);
         info.expired = (Date.now() > info.stats.mtime.getTime() + options.cacheTime);
     }
