@@ -19,9 +19,6 @@
     "dependencies": {
         "debug": "*"
     },
-    "peerDependencies": {
-        "koa": "~0.3.0"
-    },
     "devDependencies": {
         "koa": "~0.3.0",
         "mocha": "~1.17.1",
