@@ -107,7 +107,7 @@ $ npm install koa-file-cache
 # Running tests
 
 ```
-$ make test
+$ npm test
 ```
 
 
