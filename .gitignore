@@ -1,1 +1,12 @@
+# Project / testing
 test/output
+
+# Intellij project files
+*.iws
+*.iml
+.idea/
+*.iml
+
+# Npm
+node_modules
+npm-debug.log
