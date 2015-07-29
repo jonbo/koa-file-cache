@@ -1,6 +1,6 @@
 {
     "name": "koa-file-cache",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Koa middleware to cache expensive requests (e.g. remote, nested DB, etc) to disk",
     "repository": {
         "type": "git",
